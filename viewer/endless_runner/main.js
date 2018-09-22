@@ -32,7 +32,7 @@ var particleGeometry;
 var particleCount=20;
 var explosionPower =1.06;
 var particles;
-//var stats;
+var stats;
 var scoreText;
 var score;
 var hasCollided;
@@ -69,8 +69,8 @@ function createScene(){
     renderer.setSize( sceneWidth, sceneHeight );
     dom = document.getElementById('container');
 	dom.appendChild(renderer.domElement);
-	//stats = new Stats();
-	//dom.appendChild(stats.dom);
+	stats = new Stats();
+	dom.appendChild(stats.dom);
 	createTreesPool();
 	addWorld();
 	addHero();
@@ -79,7 +79,8 @@ function createScene(){
 	
 	camera.position.z = 6.5;
 	camera.position.y = 2.5;
-	/*orbitControl = new THREE.OrbitControls( camera, renderer.domElement );//helper to rotate around in scene
+    /*
+    orbitControl = new THREE.OrbitControls( camera, renderer.domElement );//helper to rotate around in scene
 	orbitControl.addEventListener( 'change', render );
 	orbitControl.noKeys = true;
 	orbitControl.noPan = true;
@@ -114,13 +115,14 @@ function createScene(){
 	infoText.style.left = 10 + 'px';
 	document.body.appendChild(infoText);
 }
+
 function addExplosion(){
 	particleGeometry = new THREE.Geometry();
 	for (var i = 0; i < particleCount; i ++ ) {
 		var vertex = new THREE.Vector3();
 		particleGeometry.vertices.push( vertex );
 	}
-	var pMaterial = new THREE.ParticleBasicMaterial({
+	var pMaterial = new THREE.PointsMaterial({
 	  color: 0xfffafa,
 	  size: 0.2
 	});
@@ -128,6 +130,7 @@ function addExplosion(){
 	scene.add( particles );
 	particles.visible=false;
 }
+
 function createTreesPool(){
 	var maxTreesInPool=10;
 	var newTree;
@@ -136,6 +139,7 @@ function createTreesPool(){
 		treesPool.push(newTree);
 	}
 }
+
 function handleKeyDown(keyEvent){
 	if(jumping)return;
 	var validMove=true;
@@ -168,9 +172,10 @@ function handleKeyDown(keyEvent){
 		bounceValue=0.06;
 	}
 }
+
 function addHero(){
 	var sphereGeometry = new THREE.DodecahedronGeometry( heroRadius, 1);
-	var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xe5f2f2 ,shading:THREE.FlatShading} )
+	var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xe5f2f2 , flatShading: true } )
 	jumping=false;
 	heroSphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 	heroSphere.receiveShadow = true;
@@ -185,7 +190,7 @@ function addWorld(){
 	var sides=40;
 	var tiers=40;
 	var sphereGeometry = new THREE.SphereGeometry( worldRadius, sides,tiers);
-	var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xfffafa ,shading:THREE.FlatShading} )
+	var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xfffafa , flatShading: true} )
 	
 	var vertexIndex;
 	var vertexVector= new THREE.Vector3();
@@ -284,6 +289,7 @@ function addTree(inPath, row, isLeft){
 	
 	rollingGroundSphere.add(newTree);
 }
+
 function createTree(){
 	var sides=8;
 	var tiers=6;
@@ -291,7 +297,7 @@ function createTree(){
 	var midPointVector= new THREE.Vector3();
 	var vertexVector= new THREE.Vector3();
 	var treeGeometry = new THREE.ConeGeometry( 0.5, 1, sides, tiers);
-	var treeMaterial = new THREE.MeshStandardMaterial( { color: 0x33ff33,shading:THREE.FlatShading  } );
+	var treeMaterial = new THREE.MeshStandardMaterial( { color: 0x33ff33, flatShading: true } );
 	var offset;
 	midPointVector=treeGeometry.vertices[0].clone();
 	var currentTier=0;
@@ -308,7 +314,7 @@ function createTree(){
 	treeTop.position.y=0.9;
 	treeTop.rotation.y=(Math.random()*(Math.PI));
 	var treeTrunkGeometry = new THREE.CylinderGeometry( 0.1, 0.1,0.5);
-	var trunkMaterial = new THREE.MeshStandardMaterial( { color: 0x886633,shading:THREE.FlatShading  } );
+	var trunkMaterial = new THREE.MeshStandardMaterial( { color: 0x886633, flatShading: true } );
 	var treeTrunk = new THREE.Mesh( treeTrunkGeometry, trunkMaterial );
 	treeTrunk.position.y=0.25;
 	var tree =new THREE.Object3D();
@@ -316,6 +322,7 @@ function createTree(){
 	tree.add(treeTop);
 	return tree;
 }
+
 function blowUpTree(vertices,sides,currentTier,scalarMultiplier,odd){
 	var vertexIndex;
 	var vertexVector= new THREE.Vector3();
@@ -347,6 +354,7 @@ function blowUpTree(vertices,sides,currentTier,scalarMultiplier,odd){
 		}
 	}
 }
+
 function tightenTree(vertices,sides,currentTier){
 	var vertexIndex;
 	var vertexVector= new THREE.Vector3();
@@ -363,7 +371,7 @@ function tightenTree(vertices,sides,currentTier){
 }
 
 function update(){
-	//stats.update();
+	stats.update();
     //animate
     rollingGroundSphere.rotation.x += rollingSpeed;
     heroSphere.rotation.x -= heroRollingSpeed;
@@ -387,6 +395,7 @@ function update(){
     render();
 	requestAnimationFrame(update);//request next update
 }
+
 function doTreeLogic(){
 	var oneTree;
 	var treePos = new THREE.Vector3();
@@ -414,6 +423,7 @@ function doTreeLogic(){
 		console.log("remove tree");
 	});
 }
+
 function doExplosionLogic(){
 	if(!particles.visible)return;
 	for (var i = 0; i < particleCount; i ++ ) {
@@ -426,6 +436,7 @@ function doExplosionLogic(){
 	}
 	particleGeometry.verticesNeedUpdate = true;
 }
+
 function explode(){
 	particles.position.y=2;
 	particles.position.z=4.8;
@@ -440,13 +451,18 @@ function explode(){
 	explosionPower=1.07;
 	particles.visible=true;
 }
+
+
+
 function render(){
     renderer.render(scene, camera);//draw
 }
+
 function gameOver () {
   //cancelAnimationFrame( globalRenderID );
   //window.clearInterval( powerupSpawnIntervalID );
 }
+
 function onWindowResize() {
 	//resize & align
 	sceneHeight = window.innerHeight;
