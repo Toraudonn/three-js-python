@@ -73,3 +73,16 @@ This is because there are no lights on the scene (pretty much like a black room)
 ## Action!
 
 To make the cube animate, we have to add the render loop to our app. This can be achieved using the renderAnimationFrame function, which was created specially for that purpose. It's supported in most of the major browsers, and for those which doesn't support it, Three.js comes with its own polyfill. 
+
+
+
+## Graph overview:
+
+- Scene
+    - Canvas
+    - Light
+    - Mesh
+        - Geometry
+        - Material
+            - Texture
+            - Texture...
